@@ -6,25 +6,24 @@
 #include <unistd.h>
 #include <time.h>
 
-
-void fileOperation(char* fileName){
-    if(ifExists(fileName) == 1){
-        FILE *f = fopen(fileName, "a");
-        fputs(f,"mali");
-        puts("mali append");
-    }else{
-        FILE *f = fopen(fileName, "w");
-        fputs(f,"mali");
-        puts("mali write");
+void fileOperation(char *fileName)
+{
+    pid_t pid = getpid();
+    pid_t ppid = getppid();
+    time_t currentTime;
+    currentTime = time(NULL);
+    char *strTime = ctime(&currentTime);
+    printf("%s", ctime(&currentTime));
+    FILE *f ;
+    if (f= fopen(fileName, "r"))
+    {
+        f = fopen(fileName, "a");
+        fprintf(f,"Time: %s, pid: %d, ppid: %d\n",strTime,pid,ppid);
     }
-}
-
-int ifExists(char* fileName){
-    FILE *f = fopen(fileName, "r");
-    if(f != NULL){
-        fclose(f);
-        return 1;
-    }else{
-        return 0;
+    else
+    {
+        f = fopen(fileName, "w");
+        fprintf(f,"Time: %s, pid: %d, ppid: %d\n",strTime,pid,ppid);
     }
+    fclose(f);
 }
