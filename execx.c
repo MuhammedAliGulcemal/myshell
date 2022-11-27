@@ -5,20 +5,38 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void execx(char *arg)
+void execx(char *arg[], int count)
 {
-    pid_t pid = fork();
-    char *path = "/bin/bash";
-    if (pid == -1)
+    if (strcmp(arg[2], "-f")== 0)//-f yazmışsa writef çağırıyorum
     {
-        return -1;
+        int fd[2];
+        char *writeArr[2] = {arg[3], NULL};//writefe göndermek için array
+        if (pipe(fd) == -1)
+        {
+            puts("An error occured!");
+            exit(1);
+        }
+        for (int i = 0; i < count; i++)//girilen sayı kadar çağırıyorum
+        {
+            int pid = fork();//fork yapma
+            int val;
+            if (pid == 0)
+            {
+                close(fd[0]);//kapama
+                val = execve(arg[1], writeArr, NULL);//execve writef için
+            }
+            wait(&val);//bekleme
+            close(fd[1]);//kapama
+        }
     }
-    if (pid == 0)
+    else//-f yazmamışsa dönüyorum
     {
-        int val = execve(path, arg, NULL);
+        puts("Wrong command!");
+        return;
     }
-    else
-    {
-        wait(NULL);
-    }
+}
+int main(int argc, char *argv[])//main metod
+{
+    execx(argv, atoi(argv[0]));
+    return 0;
 }
